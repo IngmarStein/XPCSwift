@@ -1,6 +1,6 @@
 //
 //  XPCObject.swift
-//  Monolingual
+//  XPCSwift
 //
 //  Created by Ingmar Stein on 21.07.14.
 //
