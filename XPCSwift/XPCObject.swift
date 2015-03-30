@@ -275,7 +275,7 @@ public extension XPCObject {
 	public var dictionary: [String:XPCObject]? {
 		get {
 			switch self {
-			case XPCArray(let value):
+			case XPCDictionary(let value):
 				var result = [String:XPCObject]()
 				xpc_dictionary_apply(value) { (key, value) -> Bool in
 					if let key = String.fromCString(key) {
