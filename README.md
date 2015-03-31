@@ -24,7 +24,7 @@ println(xpcArray.array?[1].string)
 
 ```ruby
 platform :osx, '10.9'
-pod 'SMJobKit', '~> 0.0.1'
+pod 'SMJobKit', '~> 0.0.2'
 ```
 
 ## Requirements
