@@ -11,6 +11,21 @@ import XPC
 
 private let xpcDateInterval : NSTimeInterval = 1000000000.0
 
+// XPC_TYPE_* constants are not visible in Swift (as of Xcode 6.3b4)
+// remove the following as soon as this is fixed
+private let xpc_type_null = xpc_get_type(xpc_null_create())
+private let xpc_type_bool = xpc_get_type(xpc_bool_create(false))
+private let xpc_type_int64 = xpc_get_type(xpc_int64_create(0))
+private let xpc_type_uint64 = xpc_get_type(xpc_uint64_create(0))
+private let xpc_type_string = xpc_get_type(xpc_string_create(""))
+private let xpc_type_double = xpc_get_type(xpc_double_create(0.0))
+private let xpc_type_data = xpc_get_type(xpc_data_create(nil, 0))
+private let xpc_type_array = xpc_get_type(xpc_array_create(nil, 0))
+private let xpc_type_dictionary = xpc_get_type(xpc_dictionary_create(nil, nil, 0))
+private let xpc_type_date = xpc_get_type(xpc_date_create_from_current())
+private let xpc_type_fd = xpc_get_type(xpc_fd_create(0))
+private let xpc_type_uuid = xpc_get_type(xpc_uuid_create(nil))
+
 // Marker protocol for types which can be represented as XPC types
 public protocol XPCRepresentable {}
 extension Bool: XPCRepresentable {}
@@ -24,8 +39,10 @@ extension Dictionary: XPCRepresentable {}
 extension NSDate: XPCRepresentable {}
 extension NSFileHandle: XPCRepresentable {}
 extension NSUUID: XPCRepresentable {}
+extension NSNull: XPCRepresentable {}
 
 public enum XPCObject : XPCRepresentable {
+	case XPCNull(xpc_object_t)
 	case XPCBool(xpc_object_t)
 	case XPCInt64(xpc_object_t)
 	case XPCUInt64(xpc_object_t)
@@ -42,6 +59,8 @@ public enum XPCObject : XPCRepresentable {
 	public init(_ object : xpc_object_t) {
 		let type = xpc_get_type(object)
 		switch type {
+		case xpc_type_null:
+			self = XPCNull(object)
 		case xpc_type_bool:
 			self = XPCBool(object)
 		case xpc_type_int64:
@@ -73,6 +92,8 @@ public enum XPCObject : XPCRepresentable {
 
 	public init(_ value : XPCRepresentable) {
 		switch value {
+		case let value as NSNull:
+			self.init(value)
 		case let value as Bool:
 			self.init(value)
 		case let value as Int64:
@@ -103,6 +124,10 @@ public enum XPCObject : XPCRepresentable {
 			// Make sure to use the protocol type when declaring the array (c.f. testArrayCast)
 			fatalError("Unhandled type in XPCObject.init(XPCRepresentable): \(value)")
 		}
+	}
+
+	public init(_ : NSNull) {
+		self = XPCNull(xpc_null_create())
 	}
 
 	public init(_ value : Bool) {
@@ -161,6 +186,8 @@ public enum XPCObject : XPCRepresentable {
 
 	public var object : xpc_object_t {
 	switch self {
+	case XPCNull(let value):
+		return value
 	case XPCBool(let value):
 		return value
 	case XPCInt64(let value):
@@ -193,32 +220,7 @@ public enum XPCObject : XPCRepresentable {
 
  extension XPCObject : Printable, DebugPrintable {
 	public var description : String {
-		switch self {
-		case XPCBool(let value):
-			return xpc_bool_get_value(value).description
-		case XPCInt64(let value):
-			return xpc_int64_get_value(value).description
-		case XPCUInt64(let value):
-			return xpc_uint64_get_value(value).description
-		case XPCString(let value):
-			return String.fromCString(xpc_string_get_string_ptr(value)) ?? "<ill-formed UTF-8 code unit sequence>"
-		case XPCDouble(let value):
-			return xpc_double_get_value(value).description
-		case XPCData(let value):
-			return value.description
-		case XPCArray(let value):
-			return value.description
-		case XPCDictionary(let value):
-			return value.description
-		case XPCDate(let value):
-			return value.description
-		case XPCFileHandle(let value):
-			return value.description
-		case XPCUUID(let value):
-			return value.description
-		case Unknown(let value):
-			return value.description
-		}
+		return object.description
 	}
 
 	public var debugDescription : String {
@@ -227,6 +229,12 @@ public enum XPCObject : XPCRepresentable {
 }
 
 // MARK: - Literals
+
+extension XPCObject : NilLiteralConvertible {
+	public init(nilLiteral: ()) {
+		self.init(NSNull())
+	}
+}
 
 extension XPCObject : BooleanLiteralConvertible {
 	public init(booleanLiteral value: BooleanLiteralType) {
@@ -278,6 +286,17 @@ extension XPCObject : DictionaryLiteralConvertible {
 // MARK: - Accessors
 
 public extension XPCObject {
+	public var null: NSNull? {
+		get {
+			switch self {
+			case XPCNull:
+				return NSNull()
+			default:
+				return nil
+			}
+		}
+	}
+
 	public var bool: Bool? {
 		get {
 			switch self {

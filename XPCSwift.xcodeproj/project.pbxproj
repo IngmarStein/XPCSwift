@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		95692B561AC9E1D90045B687 /* compat.h in Headers */ = {isa = PBXBuildFile; fileRef = 95692B541AC9E1D90045B687 /* compat.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		95692B571AC9E1D90045B687 /* compat.m in Sources */ = {isa = PBXBuildFile; fileRef = 95692B551AC9E1D90045B687 /* compat.m */; };
 		95E7D4491AC9DBB600FD8AC1 /* XPCSwift.h in Headers */ = {isa = PBXBuildFile; fileRef = 95E7D4481AC9DBB600FD8AC1 /* XPCSwift.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		95E7D44F1AC9DBB600FD8AC1 /* XPCSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95E7D4431AC9DBB600FD8AC1 /* XPCSwift.framework */; };
 		95E7D4561AC9DBB600FD8AC1 /* XPCSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95E7D4551AC9DBB600FD8AC1 /* XPCSwiftTests.swift */; };
@@ -26,8 +24,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		95692B541AC9E1D90045B687 /* compat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compat.h; sourceTree = "<group>"; };
-		95692B551AC9E1D90045B687 /* compat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = compat.m; sourceTree = "<group>"; };
 		95E7D4431AC9DBB600FD8AC1 /* XPCSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = XPCSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		95E7D4471AC9DBB600FD8AC1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		95E7D4481AC9DBB600FD8AC1 /* XPCSwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCSwift.h; sourceTree = "<group>"; };
@@ -80,8 +76,6 @@
 				95E7D45F1AC9DBF300FD8AC1 /* XPCObject.swift */,
 				95E7D4481AC9DBB600FD8AC1 /* XPCSwift.h */,
 				95E7D4461AC9DBB600FD8AC1 /* Supporting Files */,
-				95692B541AC9E1D90045B687 /* compat.h */,
-				95692B551AC9E1D90045B687 /* compat.m */,
 			);
 			path = XPCSwift;
 			sourceTree = "<group>";
@@ -118,7 +112,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				95692B561AC9E1D90045B687 /* compat.h in Headers */,
 				95E7D4491AC9DBB600FD8AC1 /* XPCSwift.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -220,7 +213,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				95E7D4601AC9DBF300FD8AC1 /* XPCObject.swift in Sources */,
-				95692B571AC9E1D90045B687 /* compat.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

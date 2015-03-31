@@ -22,6 +22,11 @@ class XPCSwiftTests: XCTestCase {
 
 	// MARK: - Roundtrips
     
+	func testNull() {
+		let xpcNull : XPCObject = nil
+		XCTAssert(xpcNull.null != nil, "null")
+	}
+
 	func testBool() {
 		XCTAssert(XPCObject(true).bool! == true, "true")
 		XCTAssert(XPCObject(false).bool! == false, "true")
