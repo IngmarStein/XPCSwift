@@ -19,7 +19,46 @@ class XPCSwiftTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
     }
+
+	// MARK: - Roundtrips
     
+	func testBool() {
+		XCTAssert(XPCObject(true).bool! == true, "true")
+		XCTAssert(XPCObject(false).bool! == false, "true")
+	}
+
+	func testInt64() {
+		XCTAssert(XPCObject(Int64.max).int64! == Int64.max, "Int64.max")
+		XCTAssert(XPCObject(Int64.allZeros).int64! == Int64.allZeros, "0")
+		XCTAssert(XPCObject(Int64.min).int64! == Int64.min, "Int64.min")
+	}
+
+	func testUInt64() {
+		XCTAssert(XPCObject(UInt64.max).uint64! == UInt64.max, "UInt64.max")
+		XCTAssert(XPCObject(UInt64.allZeros).uint64! == UInt64.allZeros, "0")
+		XCTAssert(XPCObject(UInt64.min).uint64! == UInt64.min, "UInt64.min")
+	}
+
+	func testDouble() {
+		XCTAssert(XPCObject(DBL_MAX).double! == DBL_MAX, "DBL_MAX")
+		XCTAssert(XPCObject(DBL_MIN).double! == DBL_MIN, "DBL_MIN")
+	}
+
+	func testDate() {
+		let date = NSDate()
+		XCTAssertEqualWithAccuracy(XPCObject(date).date!.timeIntervalSince1970, date.timeIntervalSince1970, DBL_EPSILON, "date")
+	}
+
+	func testFileHandle() {
+		let fileHandle = NSFileHandle(fileDescriptor: 0)
+		XCTAssert(XPCObject(fileHandle).fileHandle != nil, "file descriptor should not be nil")
+	}
+	
+	func testUUID() {
+		let uuid = NSUUID()
+		XCTAssertEqual(XPCObject(uuid).uuid!, uuid, "uuid")
+	}
+
 	// MARK: - To XPC
 
 	func testEmptyToXPC() {
@@ -29,7 +68,7 @@ class XPCSwiftTests: XCTestCase {
 	}
 
 	func testPopulatedArrayToXPC() {
-		let xpcArray = XPCObject([ XPCObject(Int64(1234)), XPCObject("test") ])
+		let xpcArray = XPCObject([ Int64(1234), "test" ])
 
 		XCTAssert(xpc_array_get_count(xpcArray.object) == 2, "array should have two elements")
 		XCTAssert(xpc_array_get_int64(xpcArray.object, 0) == 1234, "array should contain integer")
@@ -37,10 +76,10 @@ class XPCSwiftTests: XCTestCase {
 	}
 
 	func testComplexArrayToXPC() {
-		let nestedArray = [ XPCObject(Int64(1234)), XPCObject(true) ]
-		let nestedDict = [ "key1" : XPCObject("val1"), "key2" : XPCObject(Int64(-2727)) ]
+		let nestedArray : [XPCRepresentable] = [ Int64(1234), true ]
+		let nestedDict : [String:XPCRepresentable] = [ "key1" : "val1", "key2" : Int64(-2727) ]
 
-		let xpcArray = XPCObject( [XPCObject(nestedArray), XPCObject("more"), XPCObject(nestedDict)] )
+		let xpcArray = XPCObject( [nestedArray, "more", nestedDict] )
 
 		XCTAssert(xpc_array_get_count(xpcArray.object) == 3, "array should have three elements")
 
@@ -55,28 +94,6 @@ class XPCSwiftTests: XCTestCase {
 		XCTAssert(xpc_dictionary_get_count(nestedXPCDict) == 2, "nested dictionary should have two elements")
 		XCTAssert(String.fromCString(xpc_dictionary_get_string(nestedXPCDict, "key1"))! == "val1", "nested dictionary should contain string")
 		XCTAssert(xpc_dictionary_get_int64(nestedXPCDict, "key2") == -2727, "nested dictionary should contain integer")
-	}
-
-	func testBoolToXPCBool() {
-		XCTAssert(XPCObject(true).bool! == true, "true")
-		XCTAssert(XPCObject(false).bool! == false, "true")
-	}
-
-	func testInt64ToXPCInt64() {
-		XCTAssert(XPCObject(Int64.max).int64! == Int64.max, "Int64.max")
-		XCTAssert(XPCObject(Int64.allZeros).int64! == Int64.allZeros, "0")
-		XCTAssert(XPCObject(Int64.min).int64! == Int64.min, "Int64.min")
-	}
-
-	func testUInt64ToXPCUInt64() {
-		XCTAssert(XPCObject(UInt64.max).uint64! == UInt64.max, "UInt64.max")
-		XCTAssert(XPCObject(UInt64.allZeros).uint64! == UInt64.allZeros, "0")
-		XCTAssert(XPCObject(UInt64.min).uint64! == UInt64.min, "UInt64.min")
-	}
-
-	func testDoubleToXPCDouble() {
-		XCTAssert(XPCObject(DBL_MAX).double! == DBL_MAX, "DBL_MAX")
-		XCTAssert(XPCObject(DBL_MIN).double! == DBL_MIN, "DBL_MIN")
 	}
 
 	// MARK: - From XPC

@@ -18,5 +18,6 @@ extern const xpc_type_t xpc_type_double;
 extern const xpc_type_t xpc_type_data;
 extern const xpc_type_t xpc_type_array;
 extern const xpc_type_t xpc_type_dictionary;
-extern const xpc_type_t xpc_type_error;
-extern const xpc_type_t xpc_type_connection;
+extern const xpc_type_t xpc_type_date;
+extern const xpc_type_t xpc_type_fd;
+extern const xpc_type_t xpc_type_uuid;
