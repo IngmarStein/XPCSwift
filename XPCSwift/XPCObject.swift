@@ -99,7 +99,9 @@ public enum XPCObject : XPCRepresentable {
 			self.init(value.object)
 		default:
 			// Should never happen because we've checked all XPCRepresentable types
-			fatalError("Unhandled type in XPCObject.init(XPCRepresentable)")
+			// Swift 1.2: arrays of types conforming to XPCRepresentable (e.g. [String]) cannot be cast to [XPCRepresentable]
+			// Make sure to use the protocol type when declaring the array (c.f. testArrayCast)
+			fatalError("Unhandled type in XPCObject.init(XPCRepresentable): \(value)")
 		}
 	}
 

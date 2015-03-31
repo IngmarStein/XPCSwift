@@ -61,6 +61,16 @@ class XPCSwiftTests: XCTestCase {
 
 	// MARK: - To XPC
 
+	func testArrayCast() {
+		//Fails with Swift 1.2: Could not cast value of type 'Swift.Array<Swift.String>' to 'Swift.Array<XPCSwift.XPCRepresentable>'
+		//see: https://devforums.apple.com/message/1105246, https://devforums.apple.com/message/1090898#1090898
+		//let stringArray = [ "1", "2" ]
+		let stringArray : [XPCRepresentable] = [ "1", "2" ]
+		let dictionary : [String:XPCRepresentable] = [ "key" : stringArray ]
+		let protocolArray = dictionary["key"]! as? [XPCRepresentable]
+		XCTAssert(protocolArray != nil, "cast to [XPCRepresentable] should succeed")
+	}
+
 	func testEmptyToXPC() {
 		let xpcArray = XPCObject([])
 
