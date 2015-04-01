@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.platform     = :osx, "10.9"
   s.source       = { :git => "https://github.com/IngmarStein/XPCSwift.git", :tag => "0.0.2" }
 
-  s.source_files  = "XPCSwift/**/*.{m,h,swift}"
+  s.source_files  = "XPCSwift/**/*.{h,swift}"
   s.public_header_files = "XPCSwift/**/*.h"
 
   s.requires_arc = true
