@@ -24,7 +24,7 @@ private let xpc_type_array = xpc_get_type(xpc_array_create(nil, 0))
 private let xpc_type_dictionary = xpc_get_type(xpc_dictionary_create(nil, nil, 0))
 private let xpc_type_date = xpc_get_type(xpc_date_create_from_current())
 private let xpc_type_fd = xpc_get_type(xpc_fd_create(0))
-private let xpc_type_uuid = xpc_get_type(xpc_uuid_create(nil))
+private let xpc_type_uuid = xpc_get_type(xpc_uuid_create([UInt8](count: 16, repeatedValue: 0)))
 
 // Marker protocol for types which can be represented as XPC types
 public protocol XPCRepresentable {}
