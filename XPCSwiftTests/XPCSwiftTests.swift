@@ -64,6 +64,24 @@ class XPCSwiftTests: XCTestCase {
 		XCTAssertEqual(XPCObject(uuid).uuid!, uuid, "uuid")
 	}
 
+	// MARK: - Equatable
+
+	func testEquatable() {
+		let dict1 : XPCObject = [ 1, "test", false ]
+		let dict2 : XPCObject = [ 1, "test", false ]
+		let dict3 : XPCObject = [ 1, "test", true ]
+		XCTAssert(dict1 == dict2, "should be equal")
+		XCTAssert(dict1 != dict3, "should not be equal")
+	}
+
+	// MARK: - Hashable
+
+	func testHashable() {
+		let dict1 : XPCObject = [ 1, "test", false ]
+		let dict2 : [XPCObject: String] = [ dict1 : "test" ]
+		XCTAssert(dict2[dict1] == "test", "XPCObject can be used as a key")
+	}
+	
 	// MARK: - To XPC
 
 	func testArrayCast() {

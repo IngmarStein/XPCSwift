@@ -218,13 +218,27 @@ public enum XPCObject : XPCRepresentable {
 
 // MARK: - Printing
 
- extension XPCObject : Printable, DebugPrintable {
+extension XPCObject : Printable, DebugPrintable {
 	public var description : String {
 		return object.description
 	}
 
 	public var debugDescription : String {
 		return description
+	}
+}
+
+// MARK: - Equatable
+
+public func ==(lhs: XPCObject, rhs: XPCObject) -> Bool {
+	return xpc_equal(lhs.object, rhs.object)
+}
+
+// MARK: - Hashable
+
+extension XPCObject : Hashable {
+	public var hashValue: Int {
+		return xpc_hash(object)
 	}
 }
 
