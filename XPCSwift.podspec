@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.summary      = "Type safe Swift wrapper for libxpc"
 
   s.description  = <<-DESC
-                   XPCSwift makes it easy to use xpc_object_t in a type safe manner.
+                   XPCSwift makes it easy to use xpc\_object\_t in a type safe manner.
                    DESC
 
   s.homepage     = "https://github.com/IngmarStein/XPCSwift"
