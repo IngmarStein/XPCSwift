@@ -45,22 +45,22 @@ class XPCSwiftTests: XCTestCase {
 	}
 
 	func testDouble() {
-		XCTAssert(XPCObject(DBL_MAX).double! == DBL_MAX, "DBL_MAX")
-		XCTAssert(XPCObject(DBL_MIN).double! == DBL_MIN, "DBL_MIN")
+		XCTAssert(XPCObject(Double.greatestFiniteMagnitude).double! == Double.greatestFiniteMagnitude, "DBL_MAX")
+		XCTAssert(XPCObject(Double.leastNormalMagnitude).double! == Double.leastNormalMagnitude, "DBL_MIN")
 	}
 
 	func testDate() {
-		let date = NSDate()
-		XCTAssertEqualWithAccuracy(XPCObject(date).date!.timeIntervalSince1970, date.timeIntervalSince1970, DBL_EPSILON, "date")
+		let date = Date()
+		XCTAssertEqualWithAccuracy(XPCObject(date).date!.timeIntervalSince1970, date.timeIntervalSince1970, accuracy: Double.ulpOfOne, "date")
 	}
 
 	func testFileHandle() {
-		let fileHandle = NSFileHandle(fileDescriptor: 0)
+		let fileHandle = FileHandle(fileDescriptor: 0)
 		XCTAssert(XPCObject(fileHandle).fileHandle != nil, "file descriptor should not be nil")
 	}
 	
 	func testUUID() {
-		let uuid = NSUUID()
+		let uuid = UUID()
 		XCTAssertEqual(XPCObject(uuid).uuid!, uuid, "uuid")
 	}
 
@@ -105,7 +105,7 @@ class XPCSwiftTests: XCTestCase {
 
 		XCTAssert(xpc_array_get_count(xpcArray.object) == 2, "array should have two elements")
 		XCTAssert(xpc_array_get_int64(xpcArray.object, 0) == 1234, "array should contain integer")
-		XCTAssert(String.fromCString(xpc_array_get_string(xpcArray.object, 1))! == "test", "array should contain string")
+		XCTAssert(String(cString: xpc_array_get_string(xpcArray.object, 1)!) == "test", "array should contain string")
 	}
 
 	func testComplexArrayToXPC() {
@@ -121,11 +121,11 @@ class XPCSwiftTests: XCTestCase {
 		XCTAssert(xpc_array_get_int64(nestedXPCArray, 0) == 1234, "nested array should contain integer")
 		XCTAssert(xpc_array_get_bool(nestedXPCArray, 1) == true, "nested array should contain boolean")
 
-		XCTAssert(String.fromCString(xpc_array_get_string(xpcArray.object, 1))! == "more", "array should contain string")
+		XCTAssert(String(cString: xpc_array_get_string(xpcArray.object, 1)!) == "more", "array should contain string")
 
 		let nestedXPCDict = xpc_array_get_value(xpcArray.object, 2)
 		XCTAssert(xpc_dictionary_get_count(nestedXPCDict) == 2, "nested dictionary should have two elements")
-		XCTAssert(String.fromCString(xpc_dictionary_get_string(nestedXPCDict, "key1"))! == "val1", "nested dictionary should contain string")
+		XCTAssert(String(cString: xpc_dictionary_get_string(nestedXPCDict, "key1")!) == "val1", "nested dictionary should contain string")
 		XCTAssert(xpc_dictionary_get_int64(nestedXPCDict, "key2") == -2727, "nested dictionary should contain integer")
 	}
 
@@ -173,7 +173,7 @@ class XPCSwiftTests: XCTestCase {
 
 		let nestedArray = array[1].array!
 		XCTAssertEqual(nestedArray.count, 1, "Bad nested array count")
-		XCTAssertEqualWithAccuracy(nestedArray[0].double!, 27.38237, DBL_EPSILON, "basic double")
+		XCTAssertEqualWithAccuracy(nestedArray[0].double!, 27.38237, accuracy: Double.ulpOfOne, "basic double")
 	}
 
 }

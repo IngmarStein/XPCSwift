@@ -9,9 +9,9 @@
 import Foundation
 import XPC
 
-private let xpcDateInterval : NSTimeInterval = 1000000000.0
+private let xpcDateInterval: TimeInterval = 1000000000.0
 
-// XPC_TYPE_* constants are not visible in Swift (as of Xcode 6.3b4)
+// XPC_TYPE_* constants are not visible in Swift (as of Xcode 8.2)
 // remove the following as soon as this is fixed
 private let xpc_type_null = xpc_get_type(xpc_null_create())
 private let xpc_type_bool = xpc_get_type(xpc_bool_create(false))
@@ -19,12 +19,12 @@ private let xpc_type_int64 = xpc_get_type(xpc_int64_create(0))
 private let xpc_type_uint64 = xpc_get_type(xpc_uint64_create(0))
 private let xpc_type_string = xpc_get_type(xpc_string_create(""))
 private let xpc_type_double = xpc_get_type(xpc_double_create(0.0))
-private let xpc_type_data = xpc_get_type(xpc_data_create(nil, 0))
+private let xpc_type_data = xpc_get_type(xpc_data_create(UnsafeMutableRawPointer.allocate(bytes: 0, alignedTo: 0), 0))
 private let xpc_type_array = xpc_get_type(xpc_array_create(nil, 0))
 private let xpc_type_dictionary = xpc_get_type(xpc_dictionary_create(nil, nil, 0))
 private let xpc_type_date = xpc_get_type(xpc_date_create_from_current())
-private let xpc_type_fd = xpc_get_type(xpc_fd_create(0))
-private let xpc_type_uuid = xpc_get_type(xpc_uuid_create([UInt8](count: 16, repeatedValue: 0)))
+private let xpc_type_fd = xpc_get_type(xpc_fd_create(0)!)
+private let xpc_type_uuid = xpc_get_type(xpc_uuid_create([UInt8](repeating: 0, count: 16)))
 
 // Marker protocol for types which can be represented as XPC types
 public protocol XPCRepresentable {}
@@ -33,64 +33,64 @@ extension Int64: XPCRepresentable {}
 extension UInt64: XPCRepresentable {}
 extension String: XPCRepresentable {}
 extension Double: XPCRepresentable {}
-extension NSData: XPCRepresentable {}
+extension Data: XPCRepresentable {}
 extension Array: XPCRepresentable {}
 extension Dictionary: XPCRepresentable {}
-extension NSDate: XPCRepresentable {}
-extension NSFileHandle: XPCRepresentable {}
-extension NSUUID: XPCRepresentable {}
+extension Date: XPCRepresentable {}
+extension FileHandle: XPCRepresentable {}
+extension UUID: XPCRepresentable {}
 extension NSNull: XPCRepresentable {}
 
-public enum XPCObject : XPCRepresentable {
-	case XPCNull(xpc_object_t)
-	case XPCBool(xpc_object_t)
-	case XPCInt64(xpc_object_t)
-	case XPCUInt64(xpc_object_t)
-	case XPCString(xpc_object_t)
-	case XPCDouble(xpc_object_t)
-	case XPCData(xpc_object_t)
-	case XPCArray(xpc_object_t)
-	case XPCDictionary(xpc_object_t)
-	case XPCDate(xpc_object_t)
-	case XPCFileHandle(xpc_object_t)
-	case XPCUUID(xpc_object_t)
-	case Unknown(xpc_object_t)
+public enum XPCObject: XPCRepresentable {
+	case xpcNull(xpc_object_t)
+	case xpcBool(xpc_object_t)
+	case xpcInt64(xpc_object_t)
+	case xpcuInt64(xpc_object_t)
+	case xpcString(xpc_object_t)
+	case xpcDouble(xpc_object_t)
+	case xpcData(xpc_object_t)
+	case xpcArray(xpc_object_t)
+	case xpcDictionary(xpc_object_t)
+	case xpcDate(xpc_object_t)
+	case xpcFileHandle(xpc_object_t)
+	case xpcuuid(xpc_object_t)
+	case unknown(xpc_object_t)
 
-	public init(_ object : xpc_object_t) {
+	public init(_ object: xpc_object_t) {
 		let type = xpc_get_type(object)
 		switch type {
 		case xpc_type_null:
-			self = XPCNull(object)
+			self = .xpcNull(object)
 		case xpc_type_bool:
-			self = XPCBool(object)
+			self = .xpcBool(object)
 		case xpc_type_int64:
-			self = XPCInt64(object)
+			self = .xpcInt64(object)
 		case xpc_type_uint64:
-			self = XPCUInt64(object)
+			self = .xpcuInt64(object)
 		case xpc_type_string:
-			self = XPCString(object)
+			self = .xpcString(object)
 		case xpc_type_double:
-			self = XPCDouble(object)
+			self = .xpcDouble(object)
 		case xpc_type_data:
-			self = XPCData(object)
+			self = .xpcData(object)
 		case xpc_type_array:
-			self = XPCArray(object)
+			self = .xpcArray(object)
 		case xpc_type_dictionary:
-			self = XPCDictionary(object)
+			self = .xpcDictionary(object)
 		case xpc_type_dictionary:
-			self = XPCDictionary(object)
+			self = .xpcDictionary(object)
 		case xpc_type_date:
-			self = XPCDate(object)
+			self = .xpcDate(object)
 		case xpc_type_fd:
-			self = XPCFileHandle(object)
+			self = .xpcFileHandle(object)
 		case xpc_type_uuid:
-			self = XPCUUID(object)
+			self = .xpcuuid(object)
 		default:
-			self = Unknown(object)
+			self = .unknown(object)
 		}
 	}
 
-	public init(_ value : XPCRepresentable) {
+	public init(_ value: XPCRepresentable) {
 		switch value {
 		case let value as NSNull:
 			self.init(value)
@@ -104,17 +104,17 @@ public enum XPCObject : XPCRepresentable {
 			self.init(value)
 		case let value as Double:
 			self.init(value)
-		case let value as NSData:
+		case let value as Data:
 			self.init(value)
 		case let value as [XPCRepresentable]:
 			self.init(value)
 		case let value as [String:XPCRepresentable]:
 			self.init(value)
-		case let value as NSDate:
+		case let value as Date:
 			self.init(value)
-		case let value as NSFileHandle:
-			self.init(value)
-		case let value as NSUUID:
+		case let value as FileHandle:
+			self.init(value)!
+		case let value as UUID:
 			self.init(value)
 		case let value as XPCObject:
 			self.init(value.object)
@@ -126,46 +126,50 @@ public enum XPCObject : XPCRepresentable {
 		}
 	}
 
-	public init(_ : NSNull) {
-		self = XPCNull(xpc_null_create())
+	public init(_: NSNull) {
+		self = .xpcNull(xpc_null_create())
 	}
 
-	public init(_ value : Bool) {
-		self = XPCBool(xpc_bool_create(value))
+	public init(_ value: Bool) {
+		self = .xpcBool(xpc_bool_create(value))
 	}
 
-	public init(_ value : Int64) {
-		self = XPCInt64(xpc_int64_create(value))
+	public init(_ value: Int64) {
+		self = .xpcInt64(xpc_int64_create(value))
 	}
 	
-	public init(_ value : UInt64) {
-		self = XPCUInt64(xpc_uint64_create(value))
+	public init(_ value: UInt64) {
+		self = .xpcuInt64(xpc_uint64_create(value))
 	}
 	
-	public init(_ value : String) {
-		self = XPCString(value.withCString { xpc_string_create($0) })
+	public init(_ value: String) {
+		self = .xpcString(value.withCString { xpc_string_create($0) })
 	}
 	
-	public init(_ value : Double) {
-		self = XPCDouble(xpc_double_create(value))
+	public init(_ value: Double) {
+		self = .xpcDouble(xpc_double_create(value))
 	}
 	
-	public init(_ value : NSData) {
-		self = XPCData(xpc_data_create(value.bytes, value.length))
+	public init(_ value: Data) {
+		self = .xpcData(xpc_data_create((value as NSData).bytes, value.count))
 	}
 
-	public init(_ value : NSDate) {
-		self = XPCDate(xpc_date_create(Int64(value.timeIntervalSince1970 * xpcDateInterval)))
+	public init(_ value: Date) {
+		self = .xpcDate(xpc_date_create(Int64(value.timeIntervalSince1970 * xpcDateInterval)))
 	}
 
-	public init(_ value : NSFileHandle) {
-		self = XPCFileHandle(xpc_fd_create(value.fileDescriptor))
+	public init?(_ value: FileHandle) {
+		if let xpcFd = xpc_fd_create(value.fileDescriptor) {
+			self = .xpcFileHandle(xpcFd)
+		} else {
+			return nil
+		}
 	}
 
-	public init(_ value : NSUUID) {
-		var bytes = [UInt8](count: 16, repeatedValue: 0)
-		value.getUUIDBytes(&bytes)
-		self = XPCUUID(xpc_uuid_create(bytes))
+	public init(_ value: UUID) {
+		var bytes = [UInt8](repeating: 0, count: 16)
+		(value as NSUUID).getBytes(&bytes)
+		self = .xpcuuid(xpc_uuid_create(bytes))
 	}
 
 	public init(_ array: [XPCRepresentable]) {
@@ -173,7 +177,7 @@ public enum XPCObject : XPCRepresentable {
 		for value in array {
 			xpc_array_append_value(xpc_array, XPCObject(value).object)
 		}
-		self = XPCArray(xpc_array)
+		self = .xpcArray(xpc_array)
 	}
 
 	public init(_ dictionary: [String:XPCRepresentable]) {
@@ -181,36 +185,36 @@ public enum XPCObject : XPCRepresentable {
 		for (key, value) in dictionary {
 			key.withCString { xpc_dictionary_set_value(xpc_dictionary, $0, XPCObject(value).object) }
 		}
-		self = XPCDictionary(xpc_dictionary)
+		self = .xpcDictionary(xpc_dictionary)
 	}
 
-	public var object : xpc_object_t {
+	public var object: xpc_object_t {
 	switch self {
-	case XPCNull(let value):
+	case .xpcNull(let value):
 		return value
-	case XPCBool(let value):
+	case .xpcBool(let value):
 		return value
-	case XPCInt64(let value):
+	case .xpcInt64(let value):
 		return value
-	case XPCUInt64(let value):
+	case .xpcuInt64(let value):
 		return value
-	case XPCString(let value):
+	case .xpcString(let value):
 		return value
-	case XPCDouble(let value):
+	case .xpcDouble(let value):
 		return value
-	case XPCData(let value):
+	case .xpcData(let value):
 		return value
-	case XPCArray(let value):
+	case .xpcArray(let value):
 		return value
-	case XPCDictionary(let value):
+	case .xpcDictionary(let value):
 		return value
-	case XPCDate(let value):
+	case .xpcDate(let value):
 		return value
-	case XPCFileHandle(let value):
+	case .xpcFileHandle(let value):
 		return value
-	case XPCUUID(let value):
+	case .xpcuuid(let value):
 		return value
-	case Unknown(let value):
+	case .unknown(let value):
 		return value
 	}
 	}
@@ -218,12 +222,12 @@ public enum XPCObject : XPCRepresentable {
 
 // MARK: - Printing
 
-extension XPCObject : Printable, DebugPrintable {
-	public var description : String {
+extension XPCObject: CustomStringConvertible, CustomDebugStringConvertible {
+	public var description: String {
 		return object.description
 	}
 
-	public var debugDescription : String {
+	public var debugDescription: String {
 		return description
 	}
 }
@@ -236,7 +240,7 @@ public func ==(lhs: XPCObject, rhs: XPCObject) -> Bool {
 
 // MARK: - Hashable
 
-extension XPCObject : Hashable {
+extension XPCObject: Hashable {
 	public var hashValue: Int {
 		return xpc_hash(object)
 	}
@@ -244,31 +248,31 @@ extension XPCObject : Hashable {
 
 // MARK: - Literals
 
-extension XPCObject : NilLiteralConvertible {
+extension XPCObject: ExpressibleByNilLiteral {
 	public init(nilLiteral: ()) {
 		self.init(NSNull())
 	}
 }
 
-extension XPCObject : BooleanLiteralConvertible {
+extension XPCObject: ExpressibleByBooleanLiteral {
 	public init(booleanLiteral value: BooleanLiteralType) {
 		self.init(value)
 	}
 }
 
-extension XPCObject : IntegerLiteralConvertible {
+extension XPCObject: ExpressibleByIntegerLiteral {
 	public init(integerLiteral value: IntegerLiteralType) {
-		self.init(value)
+		self.init(Int64(value))
 	}
 }
 
-extension XPCObject : FloatLiteralConvertible {
+extension XPCObject: ExpressibleByFloatLiteral {
 	public init(floatLiteral value: FloatLiteralType) {
 		self.init(value)
 	}
 }
 
-extension XPCObject : StringLiteralConvertible {
+extension XPCObject: ExpressibleByStringLiteral {
 	public init(stringLiteral value: StringLiteralType) {
 		self.init(value)
 	}
@@ -280,13 +284,13 @@ extension XPCObject : StringLiteralConvertible {
 	}
 }
 
-extension XPCObject : ArrayLiteralConvertible {
+extension XPCObject: ExpressibleByArrayLiteral {
 	public init(arrayLiteral elements: XPCRepresentable...) {
 		self.init(elements)
 	}
 }
 
-extension XPCObject : DictionaryLiteralConvertible {
+extension XPCObject: ExpressibleByDictionaryLiteral {
 	public init(dictionaryLiteral elements: (String, XPCRepresentable)...) {
 		var dict = [String:XPCRepresentable]()
 		for (k, v) in elements {
@@ -303,7 +307,7 @@ public extension XPCObject {
 	public var null: NSNull? {
 		get {
 			switch self {
-			case XPCNull:
+			case .xpcNull:
 				return NSNull()
 			default:
 				return nil
@@ -314,7 +318,7 @@ public extension XPCObject {
 	public var bool: Bool? {
 		get {
 			switch self {
-			case XPCBool(let value):
+			case .xpcBool(let value):
 				return xpc_bool_get_value(value)
 			default:
 				return nil
@@ -325,7 +329,7 @@ public extension XPCObject {
 	public var int64: Int64? {
 		get {
 			switch self {
-			case XPCInt64(let value):
+			case .xpcInt64(let value):
 				return xpc_int64_get_value(value)
 			default:
 				return nil
@@ -336,7 +340,7 @@ public extension XPCObject {
 	public var uint64: UInt64? {
 		get {
 			switch self {
-			case XPCUInt64(let value):
+			case .xpcuInt64(let value):
 				return xpc_uint64_get_value(value)
 			default:
 				return nil
@@ -347,8 +351,12 @@ public extension XPCObject {
 	public var string: String? {
 		get {
 			switch self {
-			case XPCString(let value):
-				return String.fromCString(xpc_string_get_string_ptr(value))
+			case .xpcString(let value):
+				if let cString = xpc_string_get_string_ptr(value) {
+					return String(cString: cString)
+				} else {
+					return nil
+				}
 			default:
 				return nil
 			}
@@ -358,7 +366,7 @@ public extension XPCObject {
 	public var double: Double? {
 		get {
 			switch self {
-			case XPCDouble(let value):
+			case .xpcDouble(let value):
 				return xpc_double_get_value(value)
 			default:
 				return nil
@@ -366,11 +374,15 @@ public extension XPCObject {
 		}
 	}
 
-	public var data: NSData? {
+	public var data: Data? {
 		get {
 			switch self {
-			case XPCData(let value):
-				return NSData(bytes: xpc_data_get_bytes_ptr(value), length: xpc_data_get_length(value))
+			case .xpcData(let value):
+				if let bytes = UnsafeRawPointer(xpc_data_get_bytes_ptr(value)) {
+					return Data(bytes: bytes, count: xpc_data_get_length(value))
+				} else {
+					return nil
+				}
 			default:
 				return nil
 			}
@@ -380,7 +392,7 @@ public extension XPCObject {
 	public var array: [XPCObject]? {
 		get {
 			switch self {
-			case XPCArray(let value):
+			case .xpcArray(let value):
 				var result = [XPCObject]()
 				xpc_array_apply(value) { (_, element) -> Bool in
 					result.append(XPCObject(element))
@@ -396,10 +408,10 @@ public extension XPCObject {
 	public var dictionary: [String:XPCObject]? {
 		get {
 			switch self {
-			case XPCDictionary(let value):
+			case .xpcDictionary(let value):
 				var result = [String:XPCObject]()
 				xpc_dictionary_apply(value) { (key, value) -> Bool in
-					if let key = String.fromCString(key) {
+					if let key = String(validatingUTF8: key) {
 						result[key] = XPCObject(value)
 					}
 					return true
@@ -411,33 +423,33 @@ public extension XPCObject {
 		}
 	}
 
-	public var date: NSDate? {
+	public var date: Date? {
 		get {
 			switch self {
-			case XPCDate(let value):
-				return NSDate(timeIntervalSince1970: NSTimeInterval(xpc_date_get_value(value)) / xpcDateInterval)
+			case .xpcDate(let value):
+				return Date(timeIntervalSince1970: TimeInterval(xpc_date_get_value(value)) / xpcDateInterval)
 			default:
 				return nil
 			}
 		}
 	}
 
-	public var fileHandle: NSFileHandle? {
+	public var fileHandle: FileHandle? {
 		get {
 			switch self {
-			case XPCFileHandle(let value):
-				return NSFileHandle(fileDescriptor: xpc_fd_dup(value), closeOnDealloc: true)
+			case .xpcFileHandle(let value):
+				return FileHandle(fileDescriptor: xpc_fd_dup(value), closeOnDealloc: true)
 			default:
 				return nil
 			}
 		}
 	}
 
-	public var uuid: NSUUID? {
+	public var uuid: UUID? {
 		get {
 			switch self {
-			case XPCUUID(let value):
-				return NSUUID(UUIDBytes: xpc_uuid_get_bytes(value))
+			case .xpcuuid(let value):
+				return (NSUUID(uuidBytes: xpc_uuid_get_bytes(value)) as UUID)
 			default:
 				return nil
 			}
