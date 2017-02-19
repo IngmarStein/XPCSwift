@@ -24,11 +24,11 @@ println(xpcArray.array?[1].string)
 
 ```ruby
 platform :osx, '10.9'
-pod 'SMJobKit', '~> 0.0.2'
+pod 'XPCSwift', '~> 0.0.6'
 ```
 
 ## Requirements
 
-Swift requires at least OS X 10.9. Therefore, this is also the minimum target version for XPCSwift.
+XPCSwift requires at least OS X 10.9. Therefore, this is also the minimum target version for XPCSwift.
 
 XPCSwift uses Swift 3.0, i.e. it requires Xcode 8 or higher.
