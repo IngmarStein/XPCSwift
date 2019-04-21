@@ -19,7 +19,7 @@ private let xpc_type_int64 = xpc_get_type(xpc_int64_create(0))
 private let xpc_type_uint64 = xpc_get_type(xpc_uint64_create(0))
 private let xpc_type_string = xpc_get_type(xpc_string_create(""))
 private let xpc_type_double = xpc_get_type(xpc_double_create(0.0))
-private let xpc_type_data = xpc_get_type(xpc_data_create(UnsafeMutableRawPointer.allocate(bytes: 0, alignedTo: 0), 0))
+private let xpc_type_data = xpc_get_type(xpc_data_create(UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: 0), 0))
 private let xpc_type_array = xpc_get_type(xpc_array_create(nil, 0))
 private let xpc_type_dictionary = xpc_get_type(xpc_dictionary_create(nil, nil, 0))
 private let xpc_type_date = xpc_get_type(xpc_date_create_from_current())
@@ -241,8 +241,8 @@ public func ==(lhs: XPCObject, rhs: XPCObject) -> Bool {
 // MARK: - Hashable
 
 extension XPCObject: Hashable {
-	public var hashValue: Int {
-		return xpc_hash(object)
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(xpc_hash(object))
 	}
 }
 
@@ -304,7 +304,7 @@ extension XPCObject: ExpressibleByDictionaryLiteral {
 // MARK: - Accessors
 
 public extension XPCObject {
-	public var null: NSNull? {
+	var null: NSNull? {
 		get {
 			switch self {
 			case .xpcNull:
@@ -315,7 +315,7 @@ public extension XPCObject {
 		}
 	}
 
-	public var bool: Bool? {
+	var bool: Bool? {
 		get {
 			switch self {
 			case .xpcBool(let value):
@@ -326,7 +326,7 @@ public extension XPCObject {
 		}
 	}
 
-	public var int64: Int64? {
+	var int64: Int64? {
 		get {
 			switch self {
 			case .xpcInt64(let value):
@@ -337,7 +337,7 @@ public extension XPCObject {
 		}
 	}
 
-	public var uint64: UInt64? {
+	var uint64: UInt64? {
 		get {
 			switch self {
 			case .xpcuInt64(let value):
@@ -348,7 +348,7 @@ public extension XPCObject {
 		}
 	}
 
-	public var string: String? {
+	var string: String? {
 		get {
 			switch self {
 			case .xpcString(let value):
@@ -363,7 +363,7 @@ public extension XPCObject {
 		}
 	}
 
-	public var double: Double? {
+	var double: Double? {
 		get {
 			switch self {
 			case .xpcDouble(let value):
@@ -374,7 +374,7 @@ public extension XPCObject {
 		}
 	}
 
-	public var data: Data? {
+	var data: Data? {
 		get {
 			switch self {
 			case .xpcData(let value):
@@ -389,7 +389,7 @@ public extension XPCObject {
 		}
 	}
 
-	public var array: [XPCObject]? {
+	var array: [XPCObject]? {
 		get {
 			switch self {
 			case .xpcArray(let value):
@@ -405,7 +405,7 @@ public extension XPCObject {
 		}
 	}
 
-	public var dictionary: [String:XPCObject]? {
+	var dictionary: [String:XPCObject]? {
 		get {
 			switch self {
 			case .xpcDictionary(let value):
@@ -423,7 +423,7 @@ public extension XPCObject {
 		}
 	}
 
-	public var date: Date? {
+	var date: Date? {
 		get {
 			switch self {
 			case .xpcDate(let value):
@@ -434,7 +434,7 @@ public extension XPCObject {
 		}
 	}
 
-	public var fileHandle: FileHandle? {
+	var fileHandle: FileHandle? {
 		get {
 			switch self {
 			case .xpcFileHandle(let value):
@@ -445,7 +445,7 @@ public extension XPCObject {
 		}
 	}
 
-	public var uuid: UUID? {
+	var uuid: UUID? {
 		get {
 			switch self {
 			case .xpcuuid(let value):

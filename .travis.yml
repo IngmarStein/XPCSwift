@@ -1,0 +1,4 @@
+language: objective-c
+xcode_project: XPCSwift.xcodeproj
+xcode_scheme: XPCSwift
+osx_image: xcode10.2

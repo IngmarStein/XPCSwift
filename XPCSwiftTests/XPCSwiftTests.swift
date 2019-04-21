@@ -34,13 +34,13 @@ class XPCSwiftTests: XCTestCase {
 
 	func testInt64() {
 		XCTAssert(XPCObject(Int64.max).int64! == Int64.max, "Int64.max")
-		XCTAssert(XPCObject(Int64.allZeros).int64! == Int64.allZeros, "0")
+		XCTAssert(XPCObject(Int64.zero).int64! == Int64.zero, "0")
 		XCTAssert(XPCObject(Int64.min).int64! == Int64.min, "Int64.min")
 	}
 
 	func testUInt64() {
 		XCTAssert(XPCObject(UInt64.max).uint64! == UInt64.max, "UInt64.max")
-		XCTAssert(XPCObject(UInt64.allZeros).uint64! == UInt64.allZeros, "0")
+		XCTAssert(XPCObject(UInt64.zero).uint64! == UInt64.zero, "0")
 		XCTAssert(XPCObject(UInt64.min).uint64! == UInt64.min, "UInt64.min")
 	}
 
@@ -51,7 +51,7 @@ class XPCSwiftTests: XCTestCase {
 
 	func testDate() {
 		let date = Date()
-		XCTAssertEqualWithAccuracy(XPCObject(date).date!.timeIntervalSince1970, date.timeIntervalSince1970, accuracy: Double.ulpOfOne, "date")
+		XCTAssertEqual(XPCObject(date).date!.timeIntervalSince1970, date.timeIntervalSince1970, accuracy: Double.ulpOfOne, "date")
 	}
 
 	func testFileHandle() {
@@ -173,7 +173,7 @@ class XPCSwiftTests: XCTestCase {
 
 		let nestedArray = array[1].array!
 		XCTAssertEqual(nestedArray.count, 1, "Bad nested array count")
-		XCTAssertEqualWithAccuracy(nestedArray[0].double!, 27.38237, accuracy: Double.ulpOfOne, "basic double")
+		XCTAssertEqual(nestedArray[0].double!, 27.38237, accuracy: Double.ulpOfOne, "basic double")
 	}
 
 }
