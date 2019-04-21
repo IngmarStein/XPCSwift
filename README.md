@@ -1,4 +1,4 @@
-# XPCSwift
+# XPCSwift [![Travis Build Status](https://img.shields.io/travis/IngmarStein/XPCSwift.svg)](https://travis-ci.org/IngmarStein/XPCSwift)
 
 Type safe Swift wrapper for libxpc.
 
