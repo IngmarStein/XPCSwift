@@ -11,21 +11,6 @@ import XPC
 
 private let xpcDateInterval: TimeInterval = 1000000000.0
 
-// XPC_TYPE_* constants are not visible in Swift (as of Xcode 8.2)
-// remove the following as soon as this is fixed
-private let xpc_type_null = xpc_get_type(xpc_null_create())
-private let xpc_type_bool = xpc_get_type(xpc_bool_create(false))
-private let xpc_type_int64 = xpc_get_type(xpc_int64_create(0))
-private let xpc_type_uint64 = xpc_get_type(xpc_uint64_create(0))
-private let xpc_type_string = xpc_get_type(xpc_string_create(""))
-private let xpc_type_double = xpc_get_type(xpc_double_create(0.0))
-private let xpc_type_data = xpc_get_type(xpc_data_create(UnsafeMutableRawPointer.allocate(byteCount: 0, alignment: 0), 0))
-private let xpc_type_array = xpc_get_type(xpc_array_create(nil, 0))
-private let xpc_type_dictionary = xpc_get_type(xpc_dictionary_create(nil, nil, 0))
-private let xpc_type_date = xpc_get_type(xpc_date_create_from_current())
-private let xpc_type_fd = xpc_get_type(xpc_fd_create(0)!)
-private let xpc_type_uuid = xpc_get_type(xpc_uuid_create([UInt8](repeating: 0, count: 16)))
-
 // Marker protocol for types which can be represented as XPC types
 public protocol XPCRepresentable {}
 extension Bool: XPCRepresentable {}
@@ -59,31 +44,29 @@ public enum XPCObject: XPCRepresentable {
 	public init(_ object: xpc_object_t) {
 		let type = xpc_get_type(object)
 		switch type {
-		case xpc_type_null:
+		case XPC_TYPE_NULL:
 			self = .xpcNull(object)
-		case xpc_type_bool:
+		case XPC_TYPE_BOOL:
 			self = .xpcBool(object)
-		case xpc_type_int64:
+		case XPC_TYPE_INT64:
 			self = .xpcInt64(object)
-		case xpc_type_uint64:
+		case XPC_TYPE_UINT64:
 			self = .xpcuInt64(object)
-		case xpc_type_string:
+		case XPC_TYPE_STRING:
 			self = .xpcString(object)
-		case xpc_type_double:
+		case XPC_TYPE_DOUBLE:
 			self = .xpcDouble(object)
-		case xpc_type_data:
+		case XPC_TYPE_DATA:
 			self = .xpcData(object)
-		case xpc_type_array:
+		case XPC_TYPE_ARRAY:
 			self = .xpcArray(object)
-		case xpc_type_dictionary:
+		case XPC_TYPE_DICTIONARY:
 			self = .xpcDictionary(object)
-		case xpc_type_dictionary:
-			self = .xpcDictionary(object)
-		case xpc_type_date:
+		case XPC_TYPE_DATE:
 			self = .xpcDate(object)
-		case xpc_type_fd:
+		case XPC_TYPE_FD:
 			self = .xpcFileHandle(object)
-		case xpc_type_uuid:
+		case XPC_TYPE_UUID:
 			self = .xpcuuid(object)
 		default:
 			self = .unknown(object)
